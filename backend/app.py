@@ -1,13 +1,20 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+CLASH_API_TOKEN = os.getenv("CLASH_API_TOKEN")
+
+headers = {
+    "Authorization": f"Bearer {CLASH_API_TOKEN}"
+}
+
 
 app = Flask(__name__)
 CORS(app)
-
-headers = {
-    "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImYyZDZmZDZkLTQ1NDItNDQ0Yy05NzQyLTMyNDY5MTQ0MzlkNiIsImlhdCI6MTc1MDAwNTUyMiwic3ViIjoiZGV2ZWxvcGVyL2MyYWIyMDI4LTY2YTUtNDI3NS0zNGVlLTE3YjVjNjUyZTJmMSIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI1MS4xNzEuNzcuMTc2Il0sInR5cGUiOiJjbGllbnQifV19.k6jSHEGlrLhf4Echq8zyaMg0JHZHCTlPFCCxMNPTwrrxIeKX7bEx-pgFRaDcktJowhgRokmpsR-hl_3041qvAQ"
-}
 
 # Conversion function
 def convert_level(card):
@@ -41,7 +48,7 @@ def get_player_info():
 
         cards = []
         for card in player_data.get("cards", []):
-            game_level = convert_level(card)  # <-- HERE you calculate it correctly
+            game_level = convert_level(card)  
             cards.append({
                 'name': card['name'],
                 'id': card['id'],
@@ -63,5 +70,5 @@ def get_player_info():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-if __name__ ***REMOVED*** '__main__':
+if __name__ == '__main__':
     app.run(debug=True)
