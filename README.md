@@ -33,8 +33,9 @@ This project provides a backend API for fetching Clash Royale player data and ge
 ## Usage
 
 1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
+```
 2. Create a .env file containing
 ```ini
 CLASH_API_TOKEN=your_api_token_here
