@@ -3,7 +3,7 @@ from flask_cors import CORS
 import requests
 import os
 from dotenv import load_dotenv
-
+from deckBuilder import build_deck
 load_dotenv()
 
 CLASH_API_TOKEN = os.getenv("CLASH_API_TOKEN")
@@ -67,6 +67,20 @@ def get_player_info():
 
         return jsonify(response_json)
 
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/builddeck', methods=['POST'])
+def build_deck_route():
+    try:
+        data = request.get_json()
+        cards = data.get('cards')
+        if not cards or len(cards) < 8:
+            return jsonify({'error': 'Not enough cards provided'}), 400
+
+        deck = build_deck(cards)
+        return jsonify({'deck': deck})
+    
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

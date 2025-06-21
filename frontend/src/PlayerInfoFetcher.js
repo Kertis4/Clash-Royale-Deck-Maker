@@ -7,6 +7,7 @@ function PlayerInfoFetcher() {
   const [clanName, setClanName] = useState('');
   const [clanBadgeUrl, setClanBadgeUrl] = useState('');
   const [cards, setCards] = useState([]);
+  const [deck, setDeck] = useState([]);
   const [error, setError] = useState(null);
 
   const fetchPlayerInfo = async () => {
@@ -23,6 +24,7 @@ function PlayerInfoFetcher() {
         setClanName(data.clan);
         setClanBadgeUrl(data.badgeUrls?.medium || '');
         setCards(data.cards);
+        setDeck([]);
         setError(null);
       } else {
         setError(data.error || 'Unknown error');
@@ -30,6 +32,7 @@ function PlayerInfoFetcher() {
         setClanName('');
         setClanBadgeUrl('');
         setCards([]);
+        setDeck([]);
       }
     } catch (err) {
       setError(err.message);
@@ -37,27 +40,48 @@ function PlayerInfoFetcher() {
       setClanName('');
       setClanBadgeUrl('');
       setCards([]);
+      setDeck([]);
+    }
+  };
+
+  const buildDeck = async () => {
+    try {
+      const res = await fetch('http://127.0.0.1:5000/api/builddeck', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cards }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setDeck(data.deck);
+      } else {
+        setError(data.error || 'Error building deck');
+      }
+    } catch (err) {
+      setError(err.message);
     }
   };
 
   return (
-    <div className="container">
-      <div className="content-box">
-        <h1>Clash Royale Player Info</h1>
+  <div className="container">
+    <div className="content-box">
+      <h1>Clash Royale Player Info</h1>
 
-        <div className="input-section">
-          <input
-            type="text"
-            value={tag}
-            onChange={e => setTag(e.target.value)}
-            placeholder="Enter Player Tag"
-          />
-          <button onClick={fetchPlayerInfo}>Fetch Info</button>
-        </div>
+      <div className="input-section">
+        <input
+          type="text"
+          value={tag}
+          onChange={e => setTag(e.target.value)}
+          placeholder="Enter Player Tag"
+        />
+        <button onClick={fetchPlayerInfo}>Fetch Info</button>
+      </div>
 
-        {error && <p className="error">{error}</p>}
+      {error && <p className="error">{error}</p>}
 
-        {playerName && (
+      {playerName && (
+        <>
           <div className="player-info">
             <h2>{playerName}</h2>
             <div className="clan-info">
@@ -65,21 +89,45 @@ function PlayerInfoFetcher() {
               <p>{clanName}</p>
             </div>
           </div>
-        )}
 
-        <div className="cards-grid">
-          {cards.map((card, idx) => (
-            <div className="card" key={idx}>
-              <img src={card.iconUrl} alt={card.name} />
-              <p className="card-name">{card.name}</p>
-              <p>Elixir: {card.elixirCost ?? 'N/A'}</p>
-              <p>Level: {card.level}</p>
+          <div className="build-deck-section" style={{ marginBottom: '1rem' }}>
+            <button onClick={buildDeck}>Build Deck</button>
+          </div>
+
+          {/* Generated deck display right after button */}
+          {deck.length > 0 && (
+            <div className="deck-display" style={{ marginBottom: '1rem' }}>
+              <h3>Generated Deck:</h3>
+              <div className="cards-grid">
+                {deck.map((card, idx) => (
+                  <div className="card" key={idx}>
+                    <img src={card.iconUrl} alt={card.name} />
+                    <p className="card-name">{card.name}</p>
+                    <p>Elixir: {card.elixirCost ?? 'N/A'}</p>
+                    <p>Level: {card.level}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
+          )}
+
+          {/* Cards grid showing all cards */}
+          <div className="cards-grid">
+            {cards.map((card, idx) => (
+              <div className="card" key={idx}>
+                <img src={card.iconUrl} alt={card.name} />
+                <p className="card-name">{card.name}</p>
+                <p>Elixir: {card.elixirCost ?? 'N/A'}</p>
+                <p>Level: {card.level}</p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
-  );
+  </div>
+);
 }
+
 
 export default PlayerInfoFetcher;
