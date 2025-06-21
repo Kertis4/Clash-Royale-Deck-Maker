@@ -9,6 +9,9 @@ function PlayerInfoFetcher() {
   const [cards, setCards] = useState([]);
   const [deck, setDeck] = useState([]);
   const [error, setError] = useState(null);
+  const averageElixir = deck.length > 0
+  ? (deck.reduce((sum, card) => sum + (card.elixirCost ?? 0), 0) / deck.length).toFixed(2)
+  : null;
 
   const fetchPlayerInfo = async () => {
     try {
@@ -63,20 +66,25 @@ function PlayerInfoFetcher() {
     }
   };
 
-  return (
+return (
   <div className="container">
     <div className="content-box">
-      <h1>Clash Royale Player Info</h1>
+      <h1>Make a Clash Royale Deck</h1>
 
-      <div className="input-section">
-        <input
-          type="text"
-          value={tag}
-          onChange={e => setTag(e.target.value)}
-          placeholder="Enter Player Tag"
-        />
-        <button onClick={fetchPlayerInfo}>Fetch Info</button>
-      </div>
+      <div className="input-section" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
+  <div className="brutalist-container" style={{ margin: 0 }}>
+    <input
+      type="text"
+      value={tag}
+      onChange={e => setTag(e.target.value)}
+      placeholder="e.g 208Q29LCU0"
+      className="brutalist-input smooth-type"
+      autoComplete="off"
+    />
+    <label className="brutalist-label">Enter your tag</label>
+  </div>
+  <button onClick={fetchPlayerInfo}>Fetch Info</button>
+</div>
 
       {error && <p className="error">{error}</p>}
 
@@ -90,44 +98,45 @@ function PlayerInfoFetcher() {
             </div>
           </div>
 
-          <div className="build-deck-section" style={{ marginBottom: '1rem' }}>
+          <div className="build-deck-section" id="generate-button" style={{ marginBottom: '1rem' }}>
             <button onClick={buildDeck}>Build Deck</button>
           </div>
 
-          {/* Generated deck display right after button */}
+         
           {deck.length > 0 && (
             <div className="deck-display" style={{ marginBottom: '1rem' }}>
               <h3>Generated Deck:</h3>
+              <p>Average Elixir Cost: {averageElixir}</p>
               <div className="cards-grid">
                 {deck.map((card, idx) => (
                   <div className="card" key={idx}>
                     <img src={card.iconUrl} alt={card.name} />
                     <p className="card-name">{card.name}</p>
-                    <p>Elixir: {card.elixirCost ?? 'N/A'}</p>
-                    <p>Level: {card.level}</p>
+                    <p className="card-elixir">Elixir: {card.elixirCost ?? 'N/A'}</p>
+                    <p className="card-level">Level: {card.level}</p>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Cards grid showing all cards */}
-          <div className="cards-grid">
-            {cards.map((card, idx) => (
-              <div className="card" key={idx}>
-                <img src={card.iconUrl} alt={card.name} />
-                <p className="card-name">{card.name}</p>
-                <p>Elixir: {card.elixirCost ?? 'N/A'}</p>
-                <p>Level: {card.level}</p>
-              </div>
-            ))}
+          <div className="owned-cards-section" id="owned-cards">
+            <h1>Owned Cards</h1>
+            <div className="cards-grid">
+              {cards.map((card, idx) => (
+                <div className="card" key={idx}>
+                  <img src={card.iconUrl} alt={card.name} />
+                  <p className="card-name">{card.name}</p>
+                  <p>Elixir: {card.elixirCost ?? 'N/A'}</p>
+                  <p>Level: {card.level}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </>
       )}
     </div>
   </div>
-);
-}
+);}
 
-
-export default PlayerInfoFetcher;
+export default PlayerInfoFetcher
