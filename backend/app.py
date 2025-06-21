@@ -3,7 +3,7 @@ from flask_cors import CORS
 import requests
 import os
 from dotenv import load_dotenv
-from deckBuilder import build_deck
+from .deckBuilder import build_deck
 load_dotenv()
 
 CLASH_API_TOKEN = os.getenv("CLASH_API_TOKEN")
