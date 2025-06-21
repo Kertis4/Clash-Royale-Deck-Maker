@@ -3,7 +3,7 @@ from flask_cors import CORS
 import requests
 import os
 from dotenv import load_dotenv
-from backend.deckBuilder import build_deck
+from deckBuilder import build_deck
 load_dotenv()
 
 CLASH_API_TOKEN = os.getenv("CLASH_API_TOKEN")
@@ -84,5 +84,5 @@ def build_deck_route():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-#if __name__ == '__main__':
- #   app.run(debug=False)
+if __name__ == '__main__':
+   app.run(debug=False)
