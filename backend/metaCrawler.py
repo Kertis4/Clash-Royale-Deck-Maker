@@ -5,42 +5,71 @@ import json
 from collections import defaultdict
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
-CLASH_API_TOKEN = os.getenv("META_API_TOKEN")
-HEADERS = {"Authorization": f"Bearer {CLASH_API_TOKEN}"}
+API_TOKEN = os.getenv("META_API_TOKEN")
+HEADERS = {"Authorization": f"Bearer {API_TOKEN}"}
+BASE_URL = "https://api.clashroyale.com/v1"
+
 META_FILE = "meta.json"
+PARTIAL_FILE = "meta_partial.json"
 
-def get_top_players():
-    url = "https://api.clashroyale.com/v1/locations/global/rankings/players"
-    params = {"limit": 100}
-    response = requests.get(url, headers=HEADERS, params=params)
-    response.raise_for_status()
-    data = response.json()
-    return [player['tag'] for player in data['items']]
+# Generic API request with retries
+def api_get(endpoint, params=None, retries=3, sleep_time=1.5):
+    url = f"{BASE_URL}{endpoint}"
+    for attempt in range(1, retries + 1):
+        try:
+            response = requests.get(url, headers=HEADERS, params=params, timeout=10)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            print(f"[Retry {attempt}/{retries}] Error: {e}")
+            time.sleep(sleep_time)
+    print(f"❌ Failed after {retries} retries: {url}")
+    return None
 
-def get_battle_log(player_tag):
-    tag = player_tag.replace('#', '%23')
-    url = f"https://api.clashroyale.com/v1/players/{tag}/battlelog"
-    response = requests.get(url, headers=HEADERS)
-    response.raise_for_status()
-    return response.json()
+# Get top global player tags
+def get_top_player_tags(limit=100):
+    data = api_get("/locations/global/rankings/players", params={"limit": limit})
+    if not data:
+        return []
+    tags = [item["tag"] for item in data.get("items", [])]
+    print(f"✅ Fetched {len(tags)} players from global rankings")
+    return tags
 
+# Get battle log for a player
+def get_battle_log(player_tag, retries=3):
+    encoded_tag = player_tag.replace("#", "%23")
+    return api_get(f"/players/{encoded_tag}/battlelog", retries=retries)
+
+# Save partial progress
+def save_partial(meta_stats):
+    with open(PARTIAL_FILE, "w") as f:
+        json.dump(meta_stats, f, indent=2)
+    print(f"💾 Saved partial progress to {PARTIAL_FILE}")
+
+# Main crawling function
 def crawl_meta():
     usage_counts = defaultdict(int)
     win_counts = defaultdict(int)
     total_battles = 0
 
-    player_tags = get_top_players()
+    player_tags = get_top_player_tags(limit=100)
 
-    for tag in player_tags:
-        try:
-            battles = get_battle_log(tag)
-            for battle in battles:
-                if 'team' not in battle or 'opponent' not in battle:
+    for i, tag in enumerate(player_tags, 1):
+        battles = get_battle_log(tag)
+        if not battles:
+            continue
+
+        for battle in battles:
+            try:
+                team = battle['team'][0]
+                opponent = battle['opponent'][0]
+                if 'cards' not in team or 'crowns' not in team or 'crowns' not in opponent:
                     continue
 
-                team_cards = battle['team'][0]['cards']
-                team_win = battle['team'][0]['crowns'] > battle['opponent'][0]['crowns']
+                team_cards = team['cards']
+                team_win = team['crowns'] > opponent['crowns']
 
                 for card in team_cards:
                     name = card['name']
@@ -49,24 +78,37 @@ def crawl_meta():
                         win_counts[name] += 1
 
                 total_battles += 1
-            time.sleep(0.5)  
-        except Exception as e:
-            print(f"Error fetching battles for {tag}: {e}")
-            continue
+            except (KeyError, IndexError, TypeError) as e:
+                print(f"⚠️ Skipping malformed battle: {e}")
+                continue
 
-    meta_stats = {}
-    for card_name in usage_counts:
-        usage_rate = usage_counts[card_name] / (total_battles * 8) if total_battles > 0 else 0
-        win_rate = win_counts[card_name] / usage_counts[card_name] if usage_counts[card_name] > 0 else 0
-        meta_stats[card_name] = {
-            "usage_rate": usage_rate,
-            "win_rate": win_rate
+        if i % 10 == 0:
+            print(f"Progress: {i}/{len(player_tags)} players processed. Battles: {total_battles}")
+            partial_stats = {
+                name: {
+                    "usage_rate": usage_counts[name] / (total_battles * 8) if total_battles else 0,
+                    "win_rate": win_counts[name] / usage_counts[name] if usage_counts[name] else 0
+                }
+                for name in usage_counts
+            }
+            save_partial(partial_stats)
+
+        time.sleep(0.3)  # Respect API limits
+
+    # Final stats
+    meta_stats = {
+        name: {
+            "usage_rate": usage_counts[name] / (total_battles * 8) if total_battles else 0,
+            "win_rate": win_counts[name] / usage_counts[name] if usage_counts[name] else 0
         }
+        for name in usage_counts
+    }
 
     with open(META_FILE, "w") as f:
         json.dump(meta_stats, f, indent=2)
 
-    print(f"Meta data saved to {META_FILE}")
+    print(f"✅ Crawl complete. Processed {total_battles} battles across {len(player_tags)} players.")
+    print(f"📊 Meta data saved to {META_FILE}")
 
 if __name__ == "__main__":
     crawl_meta()

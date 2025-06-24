@@ -1,365 +1,95 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Courier New', monospace;
-  background-color: #f2f2f2;
-  color: #000;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 .container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #eee;
+  @apply min-h-screen bg-gray-900 text-white flex justify-center items-center py-12 px-6;
+  background: linear-gradient(180deg, #1B1F23 0%, #121619 100%);
 }
 
+
 .content-box {
-  background: #fff;
-  padding: 60px;
-  border: 5px solid #000;
-  box-shadow: 10px 10px 0 #000;
-  max-width: 900px;
-  width: 100%;
+  @apply max-w-5xl w-full bg-gray-800 bg-opacity-90 rounded-xl border border-gray-700 shadow-lg p-10;
 }
 
 h1 {
-  text-align: center;
-  margin-bottom: 50px;
-  font-size: 40px;
-  font-weight: 900;
-  border: 3px solid #000;
-  padding: 20px;
-  background-color: #f7f7f7;
-  box-shadow: 5px 5px 0 #000;
+  @apply text-4xl font-extrabold tracking-tight text-yellow-400 mb-8;
 }
+
+h2 {
+  @apply text-2xl font-semibold mb-4 text-yellow-300;
+}
+
+
 
 .input-section {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 40px;
-}
-
-.input-group {
-  display: flex;
-}
-
-.brutalist-input {
-  width: 400px;
-  padding: 20px;
-  font-size: 20px;
-  font-weight: bold;
-  color: #000;
-  background-color: #fff;
-  border: 4px solid #000;
-  outline: none;
-  box-shadow: 5px 5px 0 #000, 10px 10px 0 #ff0040;
-  border-radius: 0;
-  flex-shrink: 0;
-}
-
-button {
-  padding: 20px 40px;
-  font-family: 'Courier New', monospace;
-  font-weight: 900;
-  font-size: 20px;
-  color: #000;
-  background-color: #ffe600;
-  border: 4px solid #000;
-  box-shadow: 5px 5px 0 #000, 10px 10px 0 #ff0040;
-  cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-  
-}
-
-button:hover {
-  transform: translate(-5px, -5px);
-  box-shadow: 8px 8px 0 #000, 13px 13px 0 #ff0040;
-}
-
-button:active {
-  transform: translate(0px, 0px);
-  box-shadow: 5px 5px 0 #000, 10px 10px 0 #ff0040;
-}
-
-.error {
-  color: red;
-  text-align: center;
-  margin-bottom: 20px;
-  font-weight: 900;
-  font-size: 18px;
-  border: 3px solid #000;
-  padding: 10px;
-  background-color: #ffe6e6;
-  box-shadow: 5px 5px 0 #000;
-}
-
-.player-info {
-  text-align: center;
-  margin-bottom: 30px;
-  font-weight: 700;
-  font-size: 20px;
-}
-
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 30px;
-  margin-top: 40px;
-}
-
-.card {
-  background-color: #fff;
-  border: 5px solid #000;
-  padding: 15px;
-  text-align: center;
-  width: 150px;
-  transition: transform 0.1s;
-  box-shadow: 5px 5px 0 #000, 10px 10px 0 #ff0040;
-}
-
-.card:hover {
-  transform: translate(-5px, -5px);
-  box-shadow: 10px 10px 0 #000, 15px 15px 0 #ff0040;
-}
-
-.card img {
-  width: 100px;
-  height: 120px;
-  margin-bottom: 10px;
-}
-
-.card-name {
-  font-weight: bolder;
-  font-size: 20px;
-  text-transform: uppercase;
-}
-.card-elixir {
-  font-size: 17px;
-  font-weight: bold;
-  text-transform: uppercase; 
-
-}
-
-.card-level {
-  font-size: 17px;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.deck-display {
-  border: 5px solid #000;
-  padding: 20px;
-  margin-bottom: 2rem;
-  background-color: #fff;
-  box-shadow: 10px 10px 0 #000, 20px 20px 0 #ff0040;
-}
-
-.deck-display .cards-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(2, auto);
-  gap: 30px;
-  justify-items: center;
-}
-
-.owned-cards-section h1 {
-  margin-bottom: 1rem;
-  color: #000;
-  border-bottom: 2px solid #000;
-  padding-bottom: 0.25rem;
+  @apply flex flex-wrap gap-4 mb-8 items-center justify-center w-full;
 }
 
 
 .brutalist-container {
-  position: relative;
-  width: 250px;
-  font-family: monospace;
+  @apply relative w-full max-w-md;
+  min-width: 320px; /* force min width to avoid shrinking too small */
 }
 
 .brutalist-input {
-  width: 80%;
-  padding: 15px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #000;
-  background-color: #fff;
-  border: 4px solid #000;
-  box-shadow: 5px 5px 0 #000, 10px 10px 0 #ff0040;
-  outline: none;
-  transition: none;
+  @apply w-full bg-gray-700 rounded-md border border-yellow-400 px-4 py-3 text-white placeholder-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition;
+  padding-left: 1.25rem; /* match label left */
 }
 
 .brutalist-label {
-  position: absolute;
-  left: -3px;
-  top: -35px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #fff;
-  background-color: #000;
-  padding: 5px 10px;
-  transform: rotate(-1deg);
-  z-index: 1;
-}
-@keyframes glitch {
-  0% {
-    transform: translate(0);
-  }
-  20% {
-    transform: translate(-2px, 2px);
-  }
-  40% {
-    transform: translate(-2px, -2px);
-  }
-  60% {
-    transform: translate(2px, 2px);
-  }
-  80% {
-    transform: translate(2px, -2px);
-  }
-  100% {
-    transform: translate(0);
-  }
+  @apply absolute left-4 text-yellow-300 text-xs pointer-events-none select-none;
+  top: 0.5rem; /* bring label down a bit */
 }
 
-.brutalist-input:hover {
-  animation: focus-pulse 4s cubic-bezier(0.25, 0.8, 0.25, 1) infinite,
-    glitch 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+button {
+  @apply bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 px-6 rounded-md shadow-md transition;
 }
 
-.brutalist-input:hover::after {
-  content: "";
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: white;
-  z-index: -1;
+.error {
+  @apply text-red-500 font-semibold text-center mb-6;
 }
 
-.brutalist-input:hover::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: black;
-  z-index: -2;
-  clip-path: inset(0 100% 0 0);
-  animation: glitch-slice 4s steps(2, end) infinite;
+.player-info {
+  @apply flex items-center gap-6 mb-10;
 }
 
-@keyframes glitch-slice {
-  0% {
-    clip-path: inset(0 100% 0 0);
-  }
-  10% {
-    clip-path: inset(0 5% 0 0);
-  }
-  20% {
-    clip-path: inset(0 80% 0 0);
-  }
-  30% {
-    clip-path: inset(0 10% 0 0);
-  }
-  40% {
-    clip-path: inset(0 50% 0 0);
-  }
-  50% {
-    clip-path: inset(0 30% 0 0);
-  }
-  60% {
-    clip-path: inset(0 70% 0 0);
-  }
-  70% {
-    clip-path: inset(0 15% 0 0);
-  }
-  80% {
-    clip-path: inset(0 90% 0 0);
-  }
-  90% {
-    clip-path: inset(0 5% 0 0);
-  }
-  100% {
-    clip-path: inset(0 100% 0 0);
-  }
+.clan-info {
+  @apply flex items-center gap-4 text-yellow-400;
 }
 
-.brutalist-label {
-  position: absolute;
-  left: -3px;
-  top: -35px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #fff;
-  background-color: #000;
-  padding: 5px 10px;
-  transform: rotate(-1deg);
-  z-index: 1;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+.clan-info img {
+  @apply w-14 h-14 rounded-full border-2 border-yellow-400;
 }
 
-.brutalist-input:hover + .brutalist-label {
-  transform: rotate(0deg) scale(1.05);
-  background-color: #000; 
+.cards-grid {
+  @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6;
 }
 
-.smooth-type {
-  position: relative;
-  overflow: hidden;
+.card {
+  @apply bg-gray-700 rounded-lg border border-yellow-400 p-4 flex flex-col items-center shadow-md hover:shadow-lg transition-shadow cursor-default;
 }
 
-.smooth-type::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: linear-gradient(90deg, #fff 0%, rgba(255, 255, 255, 0) 100%);
-  z-index: 1;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.card img {
+  @apply mb-3;
+  width: 100px;
+  height: 125px;
+  object-fit: contain;
 }
 
-.smooth-type:hover::before {
-  opacity: 1;
-  animation: type-gradient 2s linear infinite;
+.card-name {
+  @apply text-yellow-300 font-semibold mb-1 text-center;
 }
 
-@keyframes type-gradient {
-  0% {
-    background-position: 300px 0;
-  }
-  100% {
-    background-position: 0 0;
-  }
+.card-elixir,
+.card-level {
+  @apply text-yellow-200 text-sm text-center;
 }
 
-.brutalist-input::placeholder {
-  color: #888;
-  transition: color 0.3s ease;
+.build-deck-section {
+  @apply mb-8;
 }
 
-.brutalist-input:hover::placeholder {
-  color: transparent;
+.build-deck-section button {
+  @apply bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold px-6 py-3 rounded-md shadow-md transition;
 }
-
-.brutalist-input:hover {
-  animation: focus-pulse 4s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
-}
-
-@keyframes focus-pulse {
-  0%,
-  100% {
-    border-color: #000;
-  }
-  50% {
-    border-color: #000; /* changed from blue to your red */
-  }
-}
-
-

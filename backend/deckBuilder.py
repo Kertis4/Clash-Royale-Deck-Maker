@@ -8,15 +8,16 @@ def load_meta():
     if os.path.exists(META_FILE):
         with open(META_FILE, "r") as f:
             data = json.load(f)
-            print(f"Loaded meta data keys: {list(data.keys())[:5]}")  # show first 5 keys
+            #print(f"Loaded meta data keys: {list(data.keys())[:5]}")  
             return data
-    print("Meta file not found, returning empty dict")
+    #print("Meta file not found, returning empty dict")
     return {}
 
 
 meta_data = load_meta()
 
 def build_deck(cards):
+    print(f"Loaded meta data keys: {list(meta_data.keys())[:5]}")  
     if len(cards) < 8:
         return cards
 
