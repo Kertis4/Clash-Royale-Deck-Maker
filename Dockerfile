@@ -30,11 +30,6 @@ COPY --from=frontend /app/frontend/dist /usr/share/nginx/html
 # Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy backend app and install Gunicorn
-COPY --from=backend /app/backend /app/backend
-RUN apk add --no-cache python3 py3-pip && \
-    
-
 # Expose the default HTTP port
 EXPOSE 80
 
