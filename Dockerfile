@@ -33,7 +33,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copy backend app and install Gunicorn
 COPY --from=backend /app/backend /app/backend
 RUN apk add --no-cache python3 py3-pip && \
-    pip install gunicorn
+    
 
 # Expose the default HTTP port
 EXPOSE 80
