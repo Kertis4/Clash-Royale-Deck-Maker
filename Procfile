@@ -1,1 +1,1 @@
-web: gunicorn backend.app:app
+web: gunicorn app:app --chdir backend -w 4 -b 0.0.0.0:8080
