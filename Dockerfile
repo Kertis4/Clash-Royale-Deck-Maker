@@ -23,6 +23,7 @@ COPY backend/ ./
 
 # ---- FINAL STAGE: NGINX + GUNICORN ----
 FROM nginx:alpine
+RUN pip install gunicorn
 
 # Copy built frontend from frontend stage
 COPY --from=frontend /app/frontend/dist /usr/share/nginx/html
