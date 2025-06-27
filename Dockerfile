@@ -1,38 +1,36 @@
-# ---- FRONTEND BUILD STAGE ----
+# ---- FINAL STAGE ----
+FROM python:3.12-slim
+
+# Install nginx and gunicorn
+RUN apt-get update && \
+    apt-get install -y nginx && \
+    pip install gunicorn && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set working directory at /app
+WORKDIR /app
+
+# Copy built frontend
+COPY --from=frontend /app/frontend/dist /usr/share/nginx/html
+
 FROM node:20-alpine AS frontend
 
 WORKDIR /app/frontend
+
+ENV NODE_OPTIONS=--max-old-space-size=256
 
 COPY frontend/package*.json ./
 RUN npm install
 
 COPY frontend/ ./
 RUN npm run build
+# Copy backend
+COPY --from=backend /app/backend /app/backend
 
-
-# ---- BACKEND BUILD STAGE ----
-FROM python:3.12-slim AS backend
-
-WORKDIR /app/backend
-
-COPY backend/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY backend/ ./
-
-
-# ---- FINAL STAGE: NGINX + GUNICORN ----
-FROM nginx:alpine
-RUN pip install gunicorn
-
-# Copy built frontend from frontend stage
-COPY --from=frontend /app/frontend/dist /usr/share/nginx/html
-
-# Copy custom nginx config
+# Copy nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose the default HTTP port
 EXPOSE 80
 
-# Start both: nginx and gunicorn using a shell
-CMD sh -c "gunicorn -w 4 -b 0.0.0.0:8080 app:app --chdir /app/backend & nginx -g 'daemon off;'"
+# THIS is the correct Gunicorn command
+CMD sh -c "gunicorn app:app --chdir backend -w 4 -b 0.0.0.0:8080 & nginx -g 'daemon off;'"
