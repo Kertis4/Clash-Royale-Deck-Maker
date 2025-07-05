@@ -8,9 +8,9 @@ def load_meta():
     if os.path.exists(META_FILE):
         with open(META_FILE, "r") as f:
             data = json.load(f)
-            #print(f"Loaded meta data keys: {list(data.keys())[:5]}")  
+            print(f"Loaded meta data keys: {list(data.keys())[:5]}")  
             return data
-    #print("Meta file not found, returning empty dict")
+    print("Meta file not found, returning empty dict")
     return {}
 
 
