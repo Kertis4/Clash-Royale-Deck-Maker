@@ -75,7 +75,9 @@ function PlayerInfoFetcher() {
       <div className="p-4 space-y-4">
         <Navbar/>
         <div className="flex justify-center mt-10">
-          <div className="bg-gray-800 border border-yellow-500 rounded-xl p-8 shadow-lg w-full max-w-md">
+         <div className={`bg-gray-800 border border-yellow-500 rounded-xl shadow-lg w-full transition-all duration-300 mt-40
+  ${playerName ? 'max-w-5xl p-12' : 'max-w-md p-8'}`}>
+
             <h2 className="text-2xl font-bold text-yellow-400 mb-6 text-center">Enter Your Player Tag</h2>
             <div className="flex flex-col gap-4 items-center">
               <input

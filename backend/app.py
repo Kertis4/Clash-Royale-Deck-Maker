@@ -4,6 +4,9 @@ import requests
 import os
 from dotenv import load_dotenv
 from deckBuilder import build_deck
+from user import db, User
+from flask_sqlalchemy import SQLAlchemy
+
 load_dotenv()
 
 CLASH_API_TOKEN = os.getenv("CLASH_API_TOKEN")
@@ -16,12 +19,75 @@ headers = {
 app = Flask(__name__)
 CORS(app)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
+
+
+with app.app_context():
+    db.create_all()
+
 # Conversion function
 def convert_level(card):
     level = card.get('level')
     maxLevel = card.get('maxLevel')
     game_level = level + (15 - maxLevel - 1)
     return game_level
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    tag = data.get('tag')
+
+    if not email or not password or not tag:
+        return jsonify({'error': 'Missing fields'}), 400
+
+    formatted_tag = tag.upper().replace("#", "")
+    full_tag = f"%23{formatted_tag}"
+
+    # Check Clash API for valid player tag
+    url = f"https://api.clashroyale.com/v1/players/{full_tag}"
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        return jsonify({'error': 'Invalid Clash Royale tag'}), 400
+
+    cr_data = response.json()
+    username = cr_data.get("name")
+
+    # Check if email or tag already exists
+    if User.query.filter((User.email == email) | (User.player_tag == formatted_tag)).first():
+        return jsonify({'error': 'Account already exists'}), 400
+
+    new_user = User.register(email=email, password=password, player_tag=formatted_tag, username=username)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'message': 'User registered successfully', 'username': username}), 201
+
+
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Missing email or password'}), 400
+
+    user = User.query.filter_by(email=email).first()
+
+    if user and user.check_password(password):
+        return jsonify({
+            'message': 'Login successful',
+            'username': user.username,
+            'player_tag': user.player_tag
+        }), 200
+    else:
+        return jsonify({'error': 'Invalid credentials'}), 401
 
 @app.route('/api/playerinfo', methods=['POST'])
 def get_player_info():
@@ -85,4 +151,6 @@ def build_deck_route():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
