@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 
-function PlayerInfoFetcher() {
+function PlayerInfoFetcher({ user }) {
   const [tag, setTag] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [clanName, setClanName] = useState('');
@@ -73,7 +73,7 @@ function PlayerInfoFetcher() {
   return (
     <div className="min-h-screen bg-gray-950 text-yellow-300 p-4 space-y-4">
       <div className="p-4 space-y-4">
-        <Navbar/>
+        <Navbar user={user} />
         <div className="flex justify-center mt-10">
          <div className={`bg-gray-800 border border-yellow-500 rounded-xl shadow-lg w-full transition-all duration-300 mt-40
   ${playerName ? 'max-w-5xl p-12' : 'max-w-md p-8'}`}>

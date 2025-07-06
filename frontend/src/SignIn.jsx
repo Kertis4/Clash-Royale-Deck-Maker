@@ -2,36 +2,67 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 
-function SignIn() {
+function SignIn({ setUser }) {  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  e.preventDefault();
+  setError('');
+
+  try {
+    const res = await fetch('http://localhost:5000/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.error || 'Login failed');
+      return;
+    }
+
+    // Check that email exists in the response
+    if (!data.email) {
+      setError('Login response missing email');
+      return;
+    }
+
+    const playerTag = data.tag;
+    let dashData = { name: '', clanName: '' };
 
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
+      const dashRes = await fetch('http://localhost:5000/api/dashboardinfo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: data.email }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Login failed');
-      } else {
-        // Store player name or tag if returned
-        localStorage.setItem('user', JSON.stringify(data)); // { email, username, tag, etc }
-        navigate('/dashboard'); // redirect after login
+      if (dashRes.ok) {
+        dashData = await dashRes.json();
       }
     } catch (err) {
-      setError('Server error');
+      console.warn('Failed to fetch dashboard info:', err);
     }
-  };
+
+    const userData = {
+      email: data.email,
+      tag: playerTag,
+      name: dashData.name || '',
+      clanName: dashData.clanName || '',
+    };
+
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+    navigate('/dashboard');
+  } catch (err) {
+    setError('Server error');
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white px-4">
