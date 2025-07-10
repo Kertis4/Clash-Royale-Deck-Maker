@@ -4,8 +4,8 @@ import requests
 import os
 from dotenv import load_dotenv
 from deckBuilder import build_deck
-from user import db, User
-from flask_sqlalchemy import SQLAlchemy
+from user import db, User, CardMeta 
+
 from collections import Counter
 
 load_dotenv()
@@ -318,7 +318,16 @@ def build_deck_route():
         if not cards or len(cards) < 8:
             return jsonify({'error': 'Not enough cards provided'}), 400
 
-        deck = build_deck(cards)
+        # Prepare meta_data from DB
+        meta_data = {}
+        metas = CardMeta.query.all()
+        for meta in metas:
+            meta_data[meta.name] = {
+                "usage_rate": meta.usage_rate,
+                "win_rate": meta.win_rate
+            }
+
+        deck = build_deck(cards, meta_data)
         return jsonify({'deck': deck})
     
     except Exception as e:

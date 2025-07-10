@@ -23,3 +23,4 @@ __pycache__/
 backend/.env
 *.log
 Thumbs.db
+backend/site.db

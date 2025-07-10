@@ -24,15 +24,17 @@ This project provides a backend API for fetching Clash Royale player data and ge
   - `/api/builddeck` [POST]: Accepts `{ cards: array }`, returns a generated deck of 8 cards (currently random).
   - `/api/register` [POST]: Allows users to register with an email, password and player tag. Player tag is checked on the royale API, and the database is queried for duplicate users before creating it.
   - `/api/login` [POST]: Allows the user to log into their account using their email and password.
+  - `/api/dashboardinfo` [POST]: Used to populate the users Dashboard, uses the email the user signs in with to query the DB for their player tag. It gets the players name, last used deck, a record of their last 4 games, their most used card, and the card that beats them the most (This is done by iterating over the battle log, see `app.py` if you want to see it in more detail)
 
 - **`user.py`**
-  Defines a `User` class as a model that encapsulates user-related data and behavior. Each instance represents a user record, with attributes like `username`, `email`, and `player_tag`, and methods for registration and password verification using secure hashing.
+  - Defines a `User` class as a model that encapsulates user-related data and behavior. Each instance represents a user record, with attributes like `username`, `email`, and `player_tag`, and methods for registration and password verification using secure hashing.
+  - It also initializes the DB used for both user info, and card stats for the deckbuilder.
 
 - **`deckBuilder.py`**  
   Contains the `build_deck(cards)` function which implements the recommender logic: scoring cards by their meta usage and win rates and selecting the top scoring cards the player owns, turns them into a deck usign `np.random.choice(len(cards), size=8, replace=False, p=probs)`.
 
 - **`metaCrawler.py`**
-  Script responsible for scraping public Clash Royale deck data, calculating usage and win rates for cards across many decks, and updating the `meta.json` file used by the backend recommender system.
+  Script responsible for scraping public Clash Royale deck data, calculating usage and win rates for cards across many decks, and updating the data base with the stats, used by the backend recommender system.
 
 - **Environment Variables**  
   Requires a `.env` file with the Clash Royale API token set as `CLASH_API_TOKEN`. 
@@ -55,13 +57,23 @@ python app.py
 
 ## Future Improvements
 
-- Improve deck generation with advanced algorithms considering card synergies, elixir cost averages, and dynamic meta shifts.
+- Improve deck generation with advanced algorithms considering card synergies, elixir cost averages.
 
-- Create individual account features (dashboard, Save Decks and maybe others)
+- Create individual account features (Save Decks and maybe others)
 
-- Change meta.json to a database for scalability
+- Cookie based Auth (prevent CSRF attacks)
 
-- Host the site (getting a raspberry pi in 3 days as of the commit so I will try and self host with that)
+- Improve web Security before hosting
+
+- Add caching of dashboard info in the db, as there is a little Delay with the api requests so it could display that and then change if it needs to for a less janky experience.
+
+- Add a save deck feature, (already has a space in the dashboard, need to add a button to save decks, and implement it in the backend)
+
+## Hosting the Site
+
+- I just got a raspberry PI I have NGINIX set up aswell as Ubuntu Server, I just need to make this site more secure, (Cookie Based Auth) and things like that.
+
+- I also plan on getting a domain in the coming days, once I am off work (the weekend) I will hopefully be able to get it up
 
 ## Contact
 
